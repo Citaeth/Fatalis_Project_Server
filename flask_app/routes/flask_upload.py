@@ -1,5 +1,4 @@
 from flask import current_app, request, jsonify, Blueprint
-
 from flask_app.flask_connect_to_db import get_db_connection
 from flask_app.utils import organize_files
 
@@ -7,11 +6,18 @@ upload_blueprint = Blueprint('upload', __name__)
 
 @upload_blueprint.route('/upload', methods=['POST'])
 def upload_file():
+    """
+    server request to upload files on server from user UI. It should receive the file, and the information needed to
+    fill the assets and files database.
+    It will download the file into a "upload" temp directory in FTS project, and build the path depending on the
+    information given.
+    :return:
+    """
     current_app.logger.debug(f"Received file")
     if 'file' not in request.files:
         current_app.logger.debug('No file part in the request')
         return 'No file part in the request', 400
-    required_fields = ['asset_version_name', 'asset_name', 'user_name', 'task', 'infos']
+    required_fields = ['asset_version_name', 'asset_name', 'user_name', 'task','status', 'infos']
     missing_fields = [field for field in required_fields if field not in request.form]
     if missing_fields:
         current_app.logger.debug(f'Missing required fields: {", ".join(missing_fields)}')
@@ -26,6 +32,7 @@ def upload_file():
     asset_name = request.form.get('asset_name', 'unknown_asset')
     user_name = request.form.get('user_name', 'unknown_user')
     task = request.form.get('task', 'unknown_task')
+    status = request.form.get('status', 'Ignore')
     infos = request.form.get('infos', 'infos')
 
     try:
@@ -69,11 +76,11 @@ def upload_file():
 
 
         insert_query = """
-                        INSERT INTO assets (name, version, task, user_id, description, asset_name, extension)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s)
+                        INSERT INTO assets (name, version, task, user_id, description, asset_name, extension, status)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                         RETURNING id
                     """
-        cursor.execute(insert_query, (filename, next_version, task, user_id, infos, asset_name, extension))
+        cursor.execute(insert_query, (filename, next_version, task, user_id, infos, asset_name, extension, status))
         asset_id = cursor.fetchone()[0]
         conn.commit()
 

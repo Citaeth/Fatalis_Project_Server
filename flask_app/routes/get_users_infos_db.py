@@ -5,7 +5,10 @@ get_users_blueprint = Blueprint('get_users', __name__)
 
 @get_users_blueprint.route('/get_users', methods=['GET'])
 def get_users():
-
+    """
+    request to get users data information in users database and send it to the user.
+    :return:
+    """
     conn = get_db_connection()
     if conn is None:
         current_app.logger.error('Database connection failed')

@@ -5,7 +5,9 @@ get_assets_blueprint = Blueprint('get_assets', __name__)
 
 @get_assets_blueprint.route('/get_assets', methods=['GET'])
 def get_assets():
-
+    """
+    request to get assets data from assets database, and send it to the user.
+    """
     conn = get_db_connection()
     if conn is None:
         current_app.logger.error('Database connection failed')

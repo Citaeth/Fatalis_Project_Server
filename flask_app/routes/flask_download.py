@@ -7,6 +7,12 @@ download_blueprint = Blueprint('download', __name__)
 
 @download_blueprint.route('/get_file', methods=['GET'])
 def get_file_path():
+    """
+    request to get the file location path in server, using the asset_id, and send it to the user.
+    The database assets (containing information that the user deal with) and files (that contain server information) are
+    linked by the asset_id.
+    :return:
+    """
     asset_id = request.args.get('asset_id')
     if not asset_id:
         return jsonify({"error": "Asset ID is required"}), 400
@@ -24,7 +30,7 @@ def get_file_path():
         if not os.path.exists(folder_path):
             return jsonify({"error": "No file found for the given asset_id"}), 404
 
-        # Créer un fichier ZIP temporaire
+        # Create temporary zip file
         zip_path = os.path.join("/tmp", f"asset_{asset_id}.zip")
         with zipfile.ZipFile(zip_path, 'w') as zipf:
             for root, _, files in os.walk(folder_path):
@@ -33,7 +39,7 @@ def get_file_path():
                     arcname = os.path.relpath(file_path, folder_path)
                     zipf.write(file_path, arcname)
 
-        # Envoyer le fichier ZIP au client
+        # Send zip file to user
         return send_file(zip_path, as_attachment=True, download_name=f"asset_{asset_id}.zip")
 
     except Exception as e:

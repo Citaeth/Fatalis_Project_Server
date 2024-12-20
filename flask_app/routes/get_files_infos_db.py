@@ -5,7 +5,10 @@ get_files_blueprint = Blueprint('get_files', __name__)
 
 @get_files_blueprint.route('/get_files', methods=['GET'])
 def get_files():
-
+    """
+    request to get files data information in files database and send it to the user.
+    :return:
+    """
     conn = get_db_connection()
     if conn is None:
         current_app.logger.error('Database connection failed')

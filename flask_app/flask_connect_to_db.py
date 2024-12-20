@@ -3,6 +3,10 @@ from psycopg2 import OperationalError
 from flask_app.config import Config
 
 def get_db_connection():
+    """
+    basic connection to the database.
+    :return:
+    """
     try:
         conn = psycopg2.connect(
             host=Config.DB_HOST,
@@ -13,10 +17,14 @@ def get_db_connection():
         )
         return conn
     except OperationalError as e:
-        print(f"Erreur de connexion à la base de données : {e}")
+        print(f"database connection error : {e}")
         return None
 
 def test_connection():
+    """
+    function to test the connection to the database.
+    :return:
+    """
     conn = get_db_connection()
     if conn:
         print("Well connected to the database!.")
